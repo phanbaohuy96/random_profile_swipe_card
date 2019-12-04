@@ -160,7 +160,7 @@ class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProv
                           SizedBox(width: 10,),
                           Icon(Icons.chat_bubble_outline, size: 40, color: Colors.grey,),
                           SizedBox(width: 10,),
-                          Icon(Icons.email, size: 40, color: Colors.grey,),
+                          Icon(Icons.lock_outline, size: 40, color: Colors.grey,),
                         ],
                       ),
                     ],
