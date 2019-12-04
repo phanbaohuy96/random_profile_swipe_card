@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:random_profile_swipe_card/ui/screen/profile_card/profile_card_page.dart';
 import 'package:random_profile_swipe_card/ui/widgets/bottom_bar_icon.dart';
+import 'package:random_profile_swipe_card/utils/config_utils.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Dimension.height = MediaQuery.of(context).size.height;
+    Dimension.width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SafeArea(
         child: Container(

@@ -3,6 +3,8 @@ import 'package:random_profile_swipe_card/base/bloc_base.dart';
 import 'package:random_profile_swipe_card/base/state_base.dart';
 import 'package:random_profile_swipe_card/blocs/profile_card_page_bloc.dart';
 import 'package:random_profile_swipe_card/ui/screen/profile_card/card_section.dart';
+import 'package:random_profile_swipe_card/utils/config_utils.dart';
+import 'package:random_profile_swipe_card/utils/extension.dart';
 
 class ProfilCardPage extends StatefulWidget {
   final double appbarHeigh;
@@ -34,6 +36,20 @@ class _ProfilCardPageState extends StateBase<ProfilCardPage> {
   }
 
   @override
+  void showNoInternetDialog() {
+    showDialog(context: context, barrierDismissible: false, builder: (context) {
+      return errorInternet(
+        width: Dimension.getWidth(0.9),
+        height: Dimension.getWidth(0.9),
+        onTap: () {
+          Navigator.pop(context);
+          _profileCardBloc.getUser();
+        }
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: widget.appbarHeigh ?? 56, bottom: 80),
@@ -43,8 +59,8 @@ class _ProfilCardPageState extends StateBase<ProfilCardPage> {
         builder: (context, snapshot) {
           switch (snapshot.data) {
             case ProfileCardState.INITIAL:
-              //_profileCardBloc.getUser();
-              _profileCardBloc.getUserMock();
+              _profileCardBloc.getUser();
+              //_profileCardBloc.getUserMock();
               return Align(
                 child:  CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
