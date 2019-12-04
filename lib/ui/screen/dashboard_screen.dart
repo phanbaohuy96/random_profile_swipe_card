@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:random_profile_swipe_card/ui/screen/profile_card_page.dart';
+import 'package:random_profile_swipe_card/ui/screen/profile_card/profile_card_page.dart';
 import 'package:random_profile_swipe_card/ui/widgets/bottom_bar_icon.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -9,8 +9,30 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
 
+  AppBar appBar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _buildAppBar(),
+                _buildBottomBar()
+              ],
+            ),
+            ProfilCardPage(appbarHeigh: appBar.preferredSize.height,),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildAppBar(){
-    return AppBar(      
+    appBar = AppBar(      
       centerTitle: true,
       backgroundColor: Colors.white,
       elevation: 0.0,
@@ -46,6 +68,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         )
       ],
     );
+    return appBar;
   }
 
   Widget _buildBottomBar(){
@@ -96,15 +119,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       )
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: ProfilCardPage(),
-      bottomNavigationBar: _buildBottomBar(),
     );
   }
 }   
