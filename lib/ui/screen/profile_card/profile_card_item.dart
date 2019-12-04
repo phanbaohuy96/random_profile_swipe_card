@@ -1,22 +1,20 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
+import 'package:random_profile_swipe_card/data/models/user.dart'; 
 import 'package:random_profile_swipe_card/ui/screen/profile_card/card_animations.dart';
-import 'package:random_profile_swipe_card/ui/screen/profile_card/indicator_stack.dart';
+import 'package:random_profile_swipe_card/ui/widgets/circle_image_outline.dart';
 
 class ProfileCardItem extends StatefulWidget {
-
-  final int cardNum, numImages;
-  final List<String> imageList = List();
+  final User user;
   final Function onCardPanUpdateCallBack, onReleaseCallback, onCardRollBackCallBack, onComplete;
 
   ProfileCardItem({ 
-    this.cardNum, 
-    this.numImages, 
     this.onCardPanUpdateCallBack, 
     this.onReleaseCallback, 
     this.onCardRollBackCallBack,
-    this.onComplete
+    this.onComplete, 
+    this.user
   }) : super(key: UniqueKey());
   
 
@@ -28,8 +26,6 @@ class ProfileCardItem extends StatefulWidget {
 
 class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProviderStateMixin {
 
-  Size _contextSize;
-  int _selectedIdx = 0;
   bool _isRollback;
   Offset _offset;
   double _rotation;
@@ -48,7 +44,6 @@ class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProv
     _controller.addStatusListener(_onComplete);
 
     super.initState();    
-    _selectedIdx = 0;
   }
 
 
@@ -87,8 +82,6 @@ class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProv
     widget.onCardPanUpdateCallBack(max(newPerX, newPerY));
   }
 
-  int get imageIdx => (_selectedIdx % 3 + 1);
-
   _onCardPanEnd()
   {
     _isRollback = !(_offset.dx >= 80.0 || _offset.dx <= -80.0);
@@ -101,19 +94,7 @@ class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProv
 
   _onTapUp(TapUpDetails details, BuildContext context)
   {
-    if(_contextSize == null)
-      _contextSize = MediaQuery.of(context).size;
-    setState(() {
-      if(details.globalPosition.dx < _contextSize.width / 2.0)
-      {
-        //previous image
-        if (_selectedIdx > 0) _selectedIdx --;
-      }
-      else{
-        //next image
-        if (_selectedIdx < widget.numImages - 1) _selectedIdx ++;
-      }
-    });
+    
   }
 
   _cardAnimRollBackOrDisappear() => !_isRollback ? 
@@ -131,63 +112,60 @@ class _ProfileCardItemState extends State<ProfileCardItem> with SingleTickerProv
             margin: EdgeInsets.all(3),  
             child: Stack(
               children: <Widget>[
-                //Create a picture
-                SizedBox.expand(
-                  child: Material(              
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.asset('assets/images/cf$imageIdx.jpg', fit: BoxFit.cover)
-                    ),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(8),
+                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      CircleImageOutline(
+                        diameter: 200,
+                        isUrlImage: true,
+                        image: widget.user.avatar,
+                        borderColor: Colors.white,
+                        borderWidth: 2,
+                      ),
+                      SizedBox(height: 50,),
+                      Text(
+                        widget.user.name.getName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      Text(
+                        widget.user.email,
+                        style: TextStyle(
+                          fontSize: 16
+                        ),
+                      ),
+                      SizedBox(height: 25,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.mail_outline, size: 40, color: Colors.grey,),
+                          SizedBox(width: 10,),
+                          Icon(Icons.people_outline, size: 40, color: Colors.grey),
+                          SizedBox(width: 10,),
+                          Icon(Icons.data_usage, size: 40, color: Colors.green),
+                          SizedBox(width: 10,),
+                          Icon(Icons.chat_bubble_outline, size: 40, color: Colors.grey,),
+                          SizedBox(width: 10,),
+                          Icon(Icons.email, size: 40, color: Colors.grey,),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-
-                //make effect gradient from center widget to end
-                SizedBox.expand(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8.0), bottomRight: Radius.circular(8.0)),
-                      gradient: LinearGradient(
-                        colors: [Colors.transparent, Colors.black54],
-                        begin: Alignment.center,
-                        end: Alignment.bottomCenter
-                      )
-                    ),
-                  ),
-                ),
-
-                //Create descristion for image
-                Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Container(
-                    margin: EdgeInsets.only(left: 6, bottom: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8.0), bottomRight: Radius.circular(8.0))
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Card number ' + widget.cardNum.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w700)),
-                        Padding(padding: EdgeInsets.only(bottom: 4.0)),
-                        Text('A short description.', textAlign: TextAlign.start, style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: IndicatorStack(
-                      Size(MediaQuery.of(context).size.width - 20, MediaQuery.of(context).size.height * 0.012), 
-                      widget.numImages, 
-                      _selectedIdx
-                    ),
-                  ),
-                ),
-
                 GestureDetector(
                   onPanUpdate: (details) => _onCardPanUpdate(details, context),
                   onPanEnd: (_) => _onCardPanEnd(),

@@ -15,17 +15,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _buildAppBar(),
-                _buildBottomBar()
-              ],
-            ),
-            ProfilCardPage(appbarHeigh: appBar.preferredSize.height,),
-          ],
+        child: Container(
+          color: Colors.black.withOpacity(0.05),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  _buildAppBar(),
+                  _buildBottomBar()
+                ],
+              ),
+              ProfilCardPage(appbarHeigh: appBar.preferredSize.height,),
+            ],
+          ),
         ),
       ),
     );

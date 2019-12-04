@@ -1,11 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:random_profile_swipe_card/networking/rest_client.dart';
 import 'package:random_profile_swipe_card/utils/utils.dart';
 
 class AppApiService {
   final dio = Dio();
+  RestClient client;
   ApiServiceHandler handlerEror;
 
   void create() {
+
+    client = RestClient(dio);
     
     dio.options.headers["X-Client-Id"] = "7E65424BD1DFF4CE17B77D74E4B96EB87137F6E1"; // config your dio headers globally
     dio.options.headers["Content-Type"] = "application/json";

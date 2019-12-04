@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:random_profile_swipe_card/base/bloc_base.dart';
+import 'package:random_profile_swipe_card/base/state_base.dart';
+import 'package:random_profile_swipe_card/blocs/profile_card_page_bloc.dart';
 import 'package:random_profile_swipe_card/ui/screen/profile_card/card_section.dart';
 
 class ProfilCardPage extends StatefulWidget {
@@ -10,12 +13,59 @@ class ProfilCardPage extends StatefulWidget {
   _ProfilCardPageState createState() => _ProfilCardPageState();
 }
 
-class _ProfilCardPageState extends State<ProfilCardPage> {
+class _ProfilCardPageState extends StateBase<ProfilCardPage> {
+  ProfileCardBloc _profileCardBloc;
+
+  @override
+  BlocBase getBloc() {
+    return _profileCardBloc;
+  }
+
+  @override
+  void initState() {
+    _profileCardBloc = ProfileCardBloc();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _profileCardBloc.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: widget.appbarHeigh ?? 56, bottom: 80),
-      child: CardSection(context),
+      child: StreamBuilder<ProfileCardState>(
+        stream: _profileCardBloc.itemStream,
+        initialData: _profileCardBloc.defaultItem,
+        builder: (context, snapshot) {
+          switch (snapshot.data) {
+            case ProfileCardState.INITIAL:
+              //_profileCardBloc.getUser();
+              _profileCardBloc.getUserMock();
+              return Align(
+                child:  CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Colors.red
+                  )
+                )
+              ); 
+            case ProfileCardState.LOADING:
+              return Align(
+                child:  CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Colors.red
+                  )
+                )
+              );
+              break;
+            case ProfileCardState.NONE:
+            default: return CardSection(context, getBloc());
+          }
+        }
+      ),
     );
   }
 }

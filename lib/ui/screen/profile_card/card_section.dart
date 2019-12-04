@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:random_profile_swipe_card/blocs/profile_card_page_bloc.dart';
 import 'package:random_profile_swipe_card/ui/screen/profile_card/card_animations.dart';
 import 'package:random_profile_swipe_card/ui/screen/profile_card/profile_card_item.dart';
 
@@ -6,9 +7,9 @@ Size backCardSize, contextSize;
 double maxPerWidthBack = 0.9, maxPerHeightBack = 0.7;
 
 class CardSection extends StatefulWidget {
-
+  final ProfileCardBloc profileCardBloc;
   
-  CardSection (BuildContext context)
+  CardSection (BuildContext context, this.profileCardBloc)
   {
     contextSize = Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height);
     backCardSize = Size(contextSize.width * maxPerWidthBack, contextSize.height * maxPerHeightBack);
@@ -18,29 +19,22 @@ class CardSection extends StatefulWidget {
   _CardSectionState createState() => _CardSectionState();
 }
 
-class _CardSectionState extends State<CardSection>  with SingleTickerProviderStateMixin
-{
-  int cardsCounter = 0;
+class _CardSectionState extends State<CardSection>  with SingleTickerProviderStateMixin{
 
   List<ProfileCardItem> cards = List();
   AnimationController _controller;
 
   @override
   void initState() {
-    
-    //create card
-    for (cardsCounter = 0; cardsCounter < 3; cardsCounter++)
-    {
+    widget.profileCardBloc.users.forEach((user) {
       cards.add(ProfileCardItem(
-        cardNum: cardsCounter + 1,
-        numImages: 9, 
         onCardPanUpdateCallBack: _onFontCardPanUpdate, 
         onReleaseCallback: changeCardOder, 
         onCardRollBackCallBack: _onCardRollBack,
         onComplete: _onCardReleaseCompleted,
-        )
+        user: user,)
       );
-    }
+    });
 
     _controller = AnimationController(duration: Duration(milliseconds: 500), vsync: this);
     _controller.addListener(() => setState( () {} ));
@@ -77,7 +71,6 @@ class _CardSectionState extends State<CardSection>  with SingleTickerProviderSta
 
   _onCardRollBack()
   {
-    print("_onCardRollBack");
     _controller.stop();
     _controller.value = 0.0;
     _controller.forward(); 
@@ -85,34 +78,46 @@ class _CardSectionState extends State<CardSection>  with SingleTickerProviderSta
 
   frontCard()
   {
-    return Align(
-      child: SizedBox.fromSize(
-        child: cards[0],
-      )
-    );
+    if(widget.profileCardBloc.users.length == 0) {
+      return Align(      
+        child: Text("Nobody Else!")
+      );
+    } else {
+      return Align(
+        child: SizedBox.fromSize(
+          child: cards[0],
+        )
+      );
+    }
   }
 
   backCard()
   {
-    return Align(      
-      child: SizedBox.fromSize(
-        size: _controller.status == AnimationStatus.forward ? CardsAnimation.backCardRollBackResizeAnim(_controller, backCardSize, Size(contextSize.width * maxPerWidthBack, contextSize.height * maxPerHeightBack)).value : backCardSize,
-        child: cards[1],
-      )
-    );
+    if(widget.profileCardBloc.users.length < 1) {
+      return SizedBox();
+    } else {
+      return Align(      
+        child: SizedBox.fromSize(
+          size: _controller.status == AnimationStatus.forward ? CardsAnimation.backCardRollBackResizeAnim(_controller, backCardSize, Size(contextSize.width * maxPerWidthBack, contextSize.height * maxPerHeightBack)).value : backCardSize,
+          child: cards[1],
+        )
+      );
+    }
   } 
 
   void changeCardOder() {
-    cards.add(ProfileCardItem(
-      cardNum: cardsCounter + 1,
-      numImages: 3, 
-      onCardPanUpdateCallBack: _onFontCardPanUpdate, 
-      onReleaseCallback: changeCardOder, 
-      onCardRollBackCallBack: _onCardRollBack,
-      onComplete: _onCardReleaseCompleted,
-      )
-    );
-    cardsCounter ++;      
-    backCardSize = Size(contextSize.width * maxPerWidthBack, contextSize.height * maxPerHeightBack);
+    widget.profileCardBloc.addUserMock().then((user) {
+      if(user != null) {
+        cards.add(ProfileCardItem(
+          onCardPanUpdateCallBack: _onFontCardPanUpdate, 
+          onReleaseCallback: changeCardOder, 
+          onCardRollBackCallBack: _onCardRollBack,
+          onComplete: _onCardReleaseCompleted,
+          user: widget.profileCardBloc.users.last,
+          )
+        );   
+        backCardSize = Size(contextSize.width * maxPerWidthBack, contextSize.height * maxPerHeightBack);
+      }
+    });
   }
 }
